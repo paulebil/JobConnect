@@ -12,5 +12,5 @@ class UserService:
     async def create_user(self, data: UserCreate) -> UserResponse:
         user_dict = data.model_dump()
         user_to_create = User(**user_dict)
-        user = self.user_repository.create_user(user_to_create)
+        user = await self.user_repository.create_user(user_to_create)
         return UserResponse.model_validate(user)

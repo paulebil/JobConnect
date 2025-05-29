@@ -9,7 +9,7 @@ def utcnow():
 
 
 class User(Base):
-    __table__ = "user"
+    __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     first_name: Mapped[str] = mapped_column(String(30))
