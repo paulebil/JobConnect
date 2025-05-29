@@ -8,7 +8,7 @@ def utcnow():
     return datetime.now(timezone.utc)
 
 
-class Users(Base):
+class User(Base):
     __table__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
