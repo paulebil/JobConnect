@@ -1,0 +1,30 @@
+services:
+  job-connect:
+    container_name: job-connect-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fastapi
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    networks:
+      - job-connect
+    volumes:
+      - ".:/usr/src/app"
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    user: "1000:1000"
+
+  adminer-service:
+    image: adminer:latest
+    container_name: adminer
+    restart: unless-stopped
+    networks:
+      - job-connect
+    ports:
+      - "8050:8050"
+
+networks:
+  job-connect:
+    driver: bridge
+
