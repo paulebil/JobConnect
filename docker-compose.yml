@@ -22,7 +22,7 @@ services:
     networks:
       - job-connect
     ports:
-      - "8050:8050"
+      - "8080:8080"
 
 networks:
   job-connect:
