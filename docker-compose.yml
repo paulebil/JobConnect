@@ -15,15 +15,6 @@ services:
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     user: "1000:1000"
 
-  adminer-service:
-    image: adminer:latest
-    container_name: adminer
-    restart: unless-stopped
-    networks:
-      - job-connect
-    ports:
-      - "8080:8080"
-
 networks:
   job-connect:
     driver: bridge
