@@ -8,7 +8,9 @@ from app.schemas.user import UserCreate
 from app.service.user import UserService
 from app.repository.user import UserRepository
 
-user_router = APIRouter()
+user_router = APIRouter(
+    tags=["User"]
+)
 
 def get_user_service(session: AsyncSession = Depends(get_session))-> UserService:
     user_repository = UserRepository(session)
