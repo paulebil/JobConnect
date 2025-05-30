@@ -17,3 +17,8 @@ class JobSeekerProfileRepository:
         except IntegrityError:
             await self.session.rollback()
             raise
+
+    async def get_profile_by_user_id(self, user_id: int) -> JobSeekerProfile | None:
+        stmt = select(JobSeekerProfile).where(JobSeekerProfile.user_id == user_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()

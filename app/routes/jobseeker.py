@@ -33,3 +33,11 @@ async def create_profile( first_name: str = Form(), last_name: str = Form(), pho
     )
 
     return await jobseeker_service.create_profile(profile_pic, resume, data)
+
+@jobseeker_router.get("/profile/{user_id}/resume")
+async def get_resume(user_id: int, jobseeker_service: JobSeekerProfileService = Depends(get_jobseeker_service)):
+    return await jobseeker_service.get_resume(user_id)
+
+@jobseeker_router.get("/profile/{user_id}/image")
+async def get_profile_pic(user_id: int, jobseeker_service: JobSeekerProfileService = Depends(get_jobseeker_service)):
+    return await jobseeker_service.get_profile_image(user_id)

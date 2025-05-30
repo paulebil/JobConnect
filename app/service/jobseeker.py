@@ -1,4 +1,6 @@
 from fastapi import UploadFile, HTTPException
+from fastapi.responses import StreamingResponse
+from io import BytesIO
 
 from app.repository.jobseeker import JobSeekerProfileRepository
 from app.schemas.jobseeker import JobSeekerProfileCreate
@@ -26,3 +28,25 @@ class JobSeekerProfileService:
         await self.jobseeker_repository.create_profile(jobseeker_profile)
 
         return {"message": "Jobseeker profile created successfully"}
+
+    async def get_resume(self, user_id: int):
+        profile = await self.jobseeker_repository.get_profile_by_user_id(user_id)
+        resume_bytes = profile.resume
+        return StreamingResponse(
+            BytesIO(resume_bytes),
+            media_type="application/pdf",
+            headers={
+                 "Content-Disposition": f"inline; filename=resume_{user_id}.pdf"
+            }
+        )
+
+    async def get_profile_image(self, user_id: int):
+        profile = await self.jobseeker_repository.get_profile_by_user_id(user_id)
+        profile_pic_bytes = profile.profile_pic
+        return StreamingResponse(
+            BytesIO(profile_pic_bytes),
+            media_type="image/jpeg",
+            headers={
+                "Content-Disposition": f"inline; filename=resume_{user_id}.jpeg"
+            }
+        )
