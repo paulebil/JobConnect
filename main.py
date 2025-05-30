@@ -2,6 +2,8 @@ from fastapi import FastAPI
 
 from app.routes.user import user_router
 from app.database.database import init_db
+from app.models.user import User
+from app.models.profile import JobSeekerProfile, EmployerCompanyProfile
 
 from contextlib import asynccontextmanager
 
