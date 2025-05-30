@@ -12,6 +12,10 @@ user_router = APIRouter(
     tags=["User"]
 )
 
+auth_user_router = APIRouter(
+    tags=["Logged IN User"]
+)
+
 def get_user_service(session: AsyncSession = Depends(get_session))-> UserService:
     user_repository = UserRepository(session)
     return UserService(user_repository)
@@ -23,3 +27,7 @@ async def create_user( data:UserCreate, user_service: UserService =Depends( get_
 @user_router.post("/login", status_code=status.HTTP_200_OK, response_model=UserResponse)
 async def login_user(data: UserLogin, user_service: UserService = Depends(get_user_service)):
     return await user_service.login_user(data)
+
+@auth_user_router.post("/logout")
+async def logout_user(user_id: int,  user_service: UserService = Depends(get_user_service)):
+    return await user_service.logout_user(user_id)

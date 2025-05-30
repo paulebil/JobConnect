@@ -1,4 +1,5 @@
 from fastapi import HTTPException,status
+from fastapi.responses import JSONResponse
 
 from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin
@@ -40,3 +41,16 @@ class UserService:
 
         logged_in_user = await self.user_repository.update_user(user_exists)
         return UserResponse.model_validate(logged_in_user)
+
+    async def logout_user(self,user_id: int):
+        user = await self.user_repository.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user with this id does not exists.")
+        # check if user is logged in
+        if not user.logged_in:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user is not logged in with us.")
+
+        # log in the user
+        user.logged_in = False
+        await self.user_repository.update_user(user)
+        return {"message": "user logged out successfully"}
