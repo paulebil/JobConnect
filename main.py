@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.routes.user import user_router
+from app.routes.jobseeker import jobseeker_router
 from app.database.database import init_db
 from app.models.user import User
 from app.models.profile import JobSeekerProfile, EmployerCompanyProfile
@@ -19,6 +20,7 @@ async def lifespan(app_: FastAPI):
 def create_application():
     application = FastAPI(lifespan=lifespan)
     application.include_router(user_router)
+    application.include_router(jobseeker_router)
 
     return application
 
