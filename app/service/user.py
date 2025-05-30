@@ -1,11 +1,11 @@
 from fastapi import HTTPException,status
 
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserLogin
 from app.responses.user import UserResponse
 from app.repository.user import UserRepository
 
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 
 class UserService:
     def __init__(self, user_repository: UserRepository):
@@ -24,3 +24,19 @@ class UserService:
         user_to_create = User(**user_dict)
         user = await self.user_repository.create_user(user_to_create)
         return UserResponse.model_validate(user)
+
+    async def login_user(self, data: UserLogin) -> UserResponse:
+        # Check if user exists
+        user_exists = await self.user_repository.get_user_by_email(str(data.email_address))
+        if not user_exists:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Sign up to create an account first.")
+
+        # Check if user password match
+        password_match = verify_password(data.password, user_exists.password)
+        if not password_match:
+            raise  HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user email or password.")
+
+        user_exists.logged_in = True
+
+        logged_in_user = await self.user_repository.update_user(user_exists)
+        return UserResponse.model_validate(logged_in_user)

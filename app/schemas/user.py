@@ -12,3 +12,10 @@ class UserCreate(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+class UserLogin(BaseModel):
+    email_address: Annotated[EmailStr, Field(...)]
+    password: Annotated[str, Field(..., min_length=8)]
+    model_config = {
+        "fom_attributes": True
+    }

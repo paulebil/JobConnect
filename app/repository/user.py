@@ -18,6 +18,16 @@ class UserRepository:
             await self.session.rollback()
             raise
 
+    async def update_user(self, user: User):
+        try:
+            await self.session.merge(user)
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+
     async def get_user_by_email(self, email: str) -> User | None:
         stmt = select(User).where(User.email_address == email)
         result = await self.session.execute(stmt)
