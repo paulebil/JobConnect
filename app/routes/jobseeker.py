@@ -9,6 +9,7 @@ from app.service.jobseeker import JobSeekerProfileService
 from app.repository.jobseeker import JobSeekerProfileRepository
 
 jobseeker_router = APIRouter(
+    prefix="/jobseeker",
     tags=["JobSeeker"]
 )
 
