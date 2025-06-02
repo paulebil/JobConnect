@@ -19,5 +19,5 @@ def get_job_service(session: AsyncSession = Depends(get_session))-> JobService:
     return JobService(job_repository)
 
 @job_router.post("/create", status_code=status.HTTP_200_OK)
-async def create_user( data:JobCreate, job_service: JobService =Depends( get_job_service)):
+async def create_job( data:JobCreate, job_service: JobService =Depends( get_job_service)):
     return await job_service.create_job(data)

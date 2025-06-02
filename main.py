@@ -3,11 +3,14 @@ from fastapi import FastAPI
 from app.routes.user import user_router
 from app.routes.jobseeker import jobseeker_router
 from app.routes.employer import employer_company_profile_router
+from app.routes.application import application_router
 from app.routes.job import job_router
+
 from app.database.database import init_db
 from app.models.user import User
 from app.models.profile import JobSeekerProfile, EmployerCompanyProfile
 from app.models.job import Job
+from app.models.application import Application
 
 from contextlib import asynccontextmanager
 
@@ -26,6 +29,7 @@ def create_application():
     application.include_router(jobseeker_router)
     application.include_router(employer_company_profile_router)
     application.include_router(job_router)
+    application.include_router(application_router)
 
     return application
 
