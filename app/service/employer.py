@@ -26,7 +26,7 @@ class EmployerCompanyProfileService:
 
         await self.employer_company_profile_repository.create_profile(employer_company_profile)
 
-        return {"message": "Jobseeker profile created successfully"}
+        return {"message": "employer profile created successfully"}
 
 
     async def get_profile_image(self, company_id: int):

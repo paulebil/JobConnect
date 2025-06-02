@@ -1,5 +1,3 @@
-from sys import prefix
-
 from fastapi import APIRouter, Form, UploadFile, File, Depends
 
 from sqlalchemy.ext.asyncio import AsyncSession

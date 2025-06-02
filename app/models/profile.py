@@ -24,6 +24,7 @@ class JobSeekerProfile(Base):
 
 class EmployerCompanyProfile(Base):
     __tablename__ = "employer_profile"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
     company_name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
@@ -33,3 +34,4 @@ class EmployerCompanyProfile(Base):
     location: Mapped[str] = mapped_column(String(100), nullable=False)
 
     user: Mapped["User"] = relationship(back_populates="employer_profile")
+    jobs: Mapped[list["Job"]] = relationship(back_populates="employer")
