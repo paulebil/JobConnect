@@ -22,3 +22,8 @@ class JobSeekerProfileRepository:
         stmt = select(JobSeekerProfile).where(JobSeekerProfile.user_id == user_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def get_profile_by_jobseeker_id(self, jobseeker_id: int) -> JobSeekerProfile | None:
+        stmt = select(JobSeekerProfile).where(JobSeekerProfile.id == jobseeker_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()

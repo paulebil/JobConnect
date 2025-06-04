@@ -17,3 +17,8 @@ class ApplicationRepository:
         except IntegrityError:
             await self.session.rollback()
             raise
+
+    async def get_all_applications(self):
+        stmt = select(Application)
+        result = await self.session.execute(stmt)
+        return result.scalars()
