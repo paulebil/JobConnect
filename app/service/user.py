@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin
-from app.responses.user import UserResponse
+from app.responses.user import UserResponse, UserDetailResponse
 from app.repository.user import UserRepository
 
 from app.core.security import hash_password, verify_password
@@ -54,3 +54,18 @@ class UserService:
         user.logged_in = False
         await self.user_repository.update_user(user)
         return {"message": "user logged out successfully"}
+
+
+    async def get_user_details(self, user_id: int) -> UserDetailResponse:
+        # check if user exists
+        user_exists = await self.user_repository.get_user_by_id(user_id)
+        if not user_exists:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User with this id does not exists.")
+
+        # check if user is logged in
+        user_logged_in = await self.user_repository.get_user_by_id(user_id)
+        if not user_logged_in.logged_in:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="User is not logged in to access this route.")
+
+        return UserDetailResponse.model_validate(user_logged_in)

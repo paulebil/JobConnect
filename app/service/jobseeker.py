@@ -1,4 +1,4 @@
-from fastapi import UploadFile, HTTPException
+from fastapi import UploadFile, HTTPException, status
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 
@@ -7,12 +7,25 @@ from app.schemas.jobseeker import JobSeekerProfileCreate
 from app.models.profile import JobSeekerProfile
 from app.responses.jobseeker import JobSeekerProfileResponse
 
+from app.repository.user import UserRepository
+
 
 class JobSeekerProfileService:
-    def __init__(self, jobseeker_repository: JobSeekerProfileRepository):
+    def __init__(self, jobseeker_repository: JobSeekerProfileRepository, user_repository: UserRepository):
         self.jobseeker_repository = jobseeker_repository
+        self.user_repository = user_repository
 
     async def create_profile(self, profile_pic: UploadFile, resume: UploadFile, data: JobSeekerProfileCreate) -> JobSeekerProfileResponse:
+        # check if user exists
+        user_exists = await self.user_repository.get_user_by_id(data.user_id)
+        if not user_exists:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User with this id does not exists.")
+        # check if profile for this user already exists
+        profile_exists = await self.jobseeker_repository.get_profile_by_user_id(data.user_id)
+        if profile_exists:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Profile for this user already exists.")
+
+        # TODO: check if phone number exists
         profile_pic_bytes = await profile_pic.read()
         resume_bytes = await resume.read()
 
@@ -31,7 +44,23 @@ class JobSeekerProfileService:
         return JobSeekerProfileResponse.model_validate(created_jobseeker)
 
     async def get_resume(self, user_id: int):
+        # check if user exists
+        user_exists = await self.user_repository.get_user_by_id(user_id)
+        if not user_exists:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User with this id does not exists.")
+
+        # check if user is logged in
+        user_logged_in = await self.user_repository.get_user_by_id(user_id)
+        if not user_logged_in.logged_in:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="User is not logged in to access this route.")
+
+        # check if profile exists.
         profile = await self.jobseeker_repository.get_profile_by_user_id(user_id)
+        if not profile:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile for this user does not exists.")
+
+        # Retrieve the profile resume
         resume_bytes = profile.resume
         return StreamingResponse(
             BytesIO(resume_bytes),
@@ -42,7 +71,22 @@ class JobSeekerProfileService:
         )
 
     async def get_profile_image(self, user_id: int):
+        # check if user exists
+        user_exists = await self.user_repository.get_user_by_id(user_id)
+        if not user_exists:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User with this id does not exists.")
+
+        # check if user is logged in
+        user_logged_in = await self.user_repository.get_user_by_id(user_id)
+        if not user_logged_in.logged_in:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is not logged in to access this route.")
+
+        # check if profile exists.
         profile = await self.jobseeker_repository.get_profile_by_user_id(user_id)
+        if not profile:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile for this user does not exists.")
+
+        # Retrieve the profile image
         profile_pic_bytes = profile.profile_pic
         return StreamingResponse(
             BytesIO(profile_pic_bytes),

@@ -9,6 +9,8 @@ from app.service.jobseeker import JobSeekerProfileService
 from app.repository.jobseeker import JobSeekerProfileRepository
 from app.responses.jobseeker import JobSeekerProfileResponse
 
+from app.repository.user import UserRepository
+
 jobseeker_router = APIRouter(
     prefix="/jobseeker",
     tags=["JobSeeker"]
@@ -17,7 +19,8 @@ jobseeker_router = APIRouter(
 
 def get_jobseeker_service(session: AsyncSession = Depends(get_session))-> JobSeekerProfileService:
     jobseeker_repository = JobSeekerProfileRepository(session)
-    return JobSeekerProfileService(jobseeker_repository)
+    user_repository = UserRepository(session)
+    return JobSeekerProfileService(jobseeker_repository, user_repository)
 
 @jobseeker_router.post("/profile", status_code=status.HTTP_201_CREATED, response_model=JobSeekerProfileResponse)
 async def create_profile( first_name: str = Form(), last_name: str = Form(), phone_number: str = Form(),

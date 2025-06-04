@@ -1,12 +1,18 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class UserResponse(BaseModel):
     id: int
-    first_name: str
-    last_name: str
     email_address: str
-    phone_number: str
 
+    model_config = {
+        "from_attributes": True
+    }
+
+class UserDetailResponse(UserResponse):
+    logged_in: bool
+    created_at: datetime
+    updated_at: datetime
     model_config = {
         "from_attributes": True
     }
