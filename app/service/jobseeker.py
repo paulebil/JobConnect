@@ -5,13 +5,14 @@ from io import BytesIO
 from app.repository.jobseeker import JobSeekerProfileRepository
 from app.schemas.jobseeker import JobSeekerProfileCreate
 from app.models.profile import JobSeekerProfile
+from app.responses.jobseeker import JobSeekerProfileResponse
 
 
 class JobSeekerProfileService:
     def __init__(self, jobseeker_repository: JobSeekerProfileRepository):
         self.jobseeker_repository = jobseeker_repository
 
-    async def create_profile(self, profile_pic: UploadFile, resume: UploadFile, data: JobSeekerProfileCreate):
+    async def create_profile(self, profile_pic: UploadFile, resume: UploadFile, data: JobSeekerProfileCreate) -> JobSeekerProfileResponse:
         profile_pic_bytes = await profile_pic.read()
         resume_bytes = await resume.read()
 
@@ -25,9 +26,9 @@ class JobSeekerProfileService:
         jobseeker_profile.profile_pic = profile_pic_bytes
         jobseeker_profile.resume = resume_bytes
 
-        await self.jobseeker_repository.create_profile(jobseeker_profile)
+        created_jobseeker = await self.jobseeker_repository.create_profile(jobseeker_profile)
 
-        return {"message": "Jobseeker profile created successfully"}
+        return JobSeekerProfileResponse.model_validate(created_jobseeker)
 
     async def get_resume(self, user_id: int):
         profile = await self.jobseeker_repository.get_profile_by_user_id(user_id)

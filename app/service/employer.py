@@ -5,13 +5,14 @@ from io import BytesIO
 from app.repository.employer import EmployerCompanyProfileRepository
 from app.schemas.employer import EmployerCompanyProfileCreate
 from app.models.profile import EmployerCompanyProfile
+from app.responses.employer import EmployerCompanyProfileResponse
 
 
 class EmployerCompanyProfileService:
     def __init__(self, employer_company_profile_repository: EmployerCompanyProfileRepository):
         self.employer_company_profile_repository = employer_company_profile_repository
 
-    async def create_profile(self, profile_pic: UploadFile, data: EmployerCompanyProfileCreate):
+    async def create_profile(self, profile_pic: UploadFile, data: EmployerCompanyProfileCreate) -> EmployerCompanyProfileResponse:
         profile_pic_bytes = await profile_pic.read()
 
         profile_to_create = data.model_dump()
@@ -22,11 +23,11 @@ class EmployerCompanyProfileService:
             raise HTTPException(status_code=400, detail="File too large.")
 
         employer_company_profile.profile_pic = profile_pic_bytes
-        employer_company_profile.user_id = 1
+        employer_company_profile.user_id = 6
 
-        await self.employer_company_profile_repository.create_profile(employer_company_profile)
+        created_employer_profile = await self.employer_company_profile_repository.create_profile(employer_company_profile)
 
-        return {"message": "employer profile created successfully"}
+        return EmployerCompanyProfileResponse.model_validate(created_employer_profile)
 
 
     async def get_profile_image(self, company_id: int):

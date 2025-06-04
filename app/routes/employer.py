@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form, UploadFile, File, Depends
+from fastapi import APIRouter, Form, UploadFile, File, Depends, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,6 +7,7 @@ from app.database.database import get_session
 from app.schemas.employer import EmployerCompanyProfileCreate
 from app.service.employer import EmployerCompanyProfileService
 from app.repository.employer import EmployerCompanyProfileRepository
+from app.responses.employer import EmployerCompanyProfileResponse
 
 employer_company_profile_router = APIRouter(
     tags=["EmployerCompany"],
@@ -18,7 +19,7 @@ def get_employer_company_profile_service(session: AsyncSession = Depends(get_ses
     employer_company_profile_repository = EmployerCompanyProfileRepository(session)
     return EmployerCompanyProfileService(employer_company_profile_repository)
 
-@employer_company_profile_router.post("/profile")
+@employer_company_profile_router.post("/profile", status_code=status.HTTP_201_CREATED, response_model=EmployerCompanyProfileResponse)
 async def create_profile( company_name: str = Form(), company_description: str = Form(), company_phone: str = Form(),
                           company_location: str = Form(), profile_pic: UploadFile = File(),
                           employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):

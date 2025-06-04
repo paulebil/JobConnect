@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form, UploadFile, File, Depends
+from fastapi import APIRouter, Form, UploadFile, File, Depends, status
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,6 +7,7 @@ from app.database.database import get_session
 from app.schemas.jobseeker import JobSeekerProfileCreate
 from app.service.jobseeker import JobSeekerProfileService
 from app.repository.jobseeker import JobSeekerProfileRepository
+from app.responses.jobseeker import JobSeekerProfileResponse
 
 jobseeker_router = APIRouter(
     prefix="/jobseeker",
@@ -18,7 +19,7 @@ def get_jobseeker_service(session: AsyncSession = Depends(get_session))-> JobSee
     jobseeker_repository = JobSeekerProfileRepository(session)
     return JobSeekerProfileService(jobseeker_repository)
 
-@jobseeker_router.post("/profile")
+@jobseeker_router.post("/profile", status_code=status.HTTP_201_CREATED, response_model=JobSeekerProfileResponse)
 async def create_profile( first_name: str = Form(), last_name: str = Form(), phone_number: str = Form(),
                           years_of_experience: int = Form(), education_level: str = Form(), user_id: int = Form(),
                           profile_pic: UploadFile = File(), resume: UploadFile = File(),
