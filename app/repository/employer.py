@@ -18,7 +18,7 @@ class EmployerCompanyProfileRepository:
             await self.session.rollback()
             raise
 
-    async def get_profile_by_company_id(self, company_id: int) -> EmployerCompanyProfile | None:
-        stmt = select(EmployerCompanyProfile).where(EmployerCompanyProfile.id == company_id)
+    async def get_profile_by_employer_id(self, employer_id: int) -> EmployerCompanyProfile | None:
+        stmt = select(EmployerCompanyProfile).where(EmployerCompanyProfile.id == employer_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()

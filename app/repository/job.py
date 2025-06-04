@@ -17,3 +17,12 @@ class JobRepository:
         except IntegrityError:
             await self.session.rollback()
             raise
+
+    async def get_all_jobs(self):
+        try:
+            stmt = select(Job)
+            result = await self.session.execute(stmt)
+            jobs = result.scalars().all()
+            return jobs
+        except Exception:
+            raise
