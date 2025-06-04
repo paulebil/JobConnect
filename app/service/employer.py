@@ -23,7 +23,6 @@ class EmployerCompanyProfileService:
             raise HTTPException(status_code=400, detail="File too large.")
 
         employer_company_profile.profile_pic = profile_pic_bytes
-        employer_company_profile.user_id = 6
 
         created_employer_profile = await self.employer_company_profile_repository.create_profile(employer_company_profile)
 

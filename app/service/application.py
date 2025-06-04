@@ -11,9 +11,6 @@ class ApplicationService:
 
         application = data.model_dump()
         application_to_create = Application(**application)
-
-        application_to_create.jobseeker_id = 4
-
         created_application = await self.application_repository.create_application(application_to_create)
 
         return ApplicationResponse.model_validate(created_application)

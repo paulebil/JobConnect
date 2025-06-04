@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
+from typing import Annotated
 
 class ApplicationStatus(str, Enum):
     PENDING = "pending"
@@ -9,5 +10,6 @@ class ApplicationStatus(str, Enum):
     ACCEPTED = "accepted"
 
 class ApplicationCreate(BaseModel):
-    job_id: int
+    jobseeker_id: Annotated[int, Field(...)]
+    job_id: Annotated[int, Field(...)]
     status: ApplicationStatus = ApplicationStatus.PENDING

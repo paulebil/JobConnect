@@ -14,7 +14,6 @@ class JobService:
         job_to_create = Job(**job)
 
         job_to_create.is_active = False
-        job_to_create.employer_id = 1
 
         created_job = await self.job_repository.create_job(job_to_create)
 

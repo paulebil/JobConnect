@@ -20,11 +20,12 @@ def get_employer_company_profile_service(session: AsyncSession = Depends(get_ses
     return EmployerCompanyProfileService(employer_company_profile_repository)
 
 @employer_company_profile_router.post("/profile", status_code=status.HTTP_201_CREATED, response_model=EmployerCompanyProfileResponse)
-async def create_profile( company_name: str = Form(), company_description: str = Form(), company_phone: str = Form(),
+async def create_profile( user_id: int = Form(), company_name: str = Form(), company_description: str = Form(), company_phone: str = Form(),
                           company_location: str = Form(), profile_pic: UploadFile = File(),
                           employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
 
     data = EmployerCompanyProfileCreate(
+        user_id=user_id,
         company_name=company_name,
         company_description=company_description,
         company_phone=company_phone,
