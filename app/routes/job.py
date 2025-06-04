@@ -31,3 +31,8 @@ async def create_job( data:JobCreate, job_service: JobService =Depends( get_job_
 @job_router.get("/all", status_code=status.HTTP_200_OK, response_model=List[JobResponse])
 async def get_all_jobs(job_service: JobService = Depends(get_job_service)):
     return await job_service.get_all_jobs()
+
+
+@job_router.get("/{job_id}", status_code=status.HTTP_200_OK, response_model=JobResponse)
+async def get_job_detail(job_id: int, job_service: JobService = Depends(get_job_service)):
+    return await job_service.get_job_detail(job_id)

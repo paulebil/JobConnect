@@ -49,3 +49,10 @@ class JobService:
         return [JobResponse.model_validate(job) for job in jobs]
 
 
+    async def get_job_detail(self, job_id: int) -> JobResponse:
+        job = await self.job_repository.get_job_detail(job_id)
+        if not job:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job with this id does not exists.")
+
+        return JobResponse.model_validate(job)
+

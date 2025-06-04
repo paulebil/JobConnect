@@ -26,3 +26,9 @@ class JobRepository:
             return jobs
         except Exception:
             raise
+
+    async def get_job_detail(self, job_id: int) -> Job | None:
+        stmt = select(Job).where(Job.id == job_id)
+        result = await self.session.execute(stmt)
+        job = result.scalar_one_or_none()
+        return job
