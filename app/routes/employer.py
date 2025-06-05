@@ -9,6 +9,9 @@ from app.service.employer import EmployerCompanyProfileService
 from app.repository.employer import EmployerCompanyProfileRepository
 from app.responses.employer import EmployerCompanyProfileResponse
 
+from app.repository.user import UserRepository
+from app.repository.jobseeker import JobSeekerProfileRepository
+
 employer_company_profile_router = APIRouter(
     tags=["EmployerCompany"],
     prefix="/company",
@@ -17,7 +20,10 @@ employer_company_profile_router = APIRouter(
 
 def get_employer_company_profile_service(session: AsyncSession = Depends(get_session))-> EmployerCompanyProfileService:
     employer_company_profile_repository = EmployerCompanyProfileRepository(session)
-    return EmployerCompanyProfileService(employer_company_profile_repository)
+    user_repository = UserRepository(session)
+    jobseeker_profile_repository = JobSeekerProfileRepository(session)
+    return EmployerCompanyProfileService(employer_company_profile_repository, user_repository, jobseeker_profile_repository)
+
 
 @employer_company_profile_router.post("/profile", status_code=status.HTTP_201_CREATED, response_model=EmployerCompanyProfileResponse)
 async def create_profile( user_id: int = Form(), company_name: str = Form(), company_description: str = Form(), company_phone: str = Form(),

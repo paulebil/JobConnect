@@ -20,7 +20,6 @@ class UserService:
         # Hash user password
         hashed_password = hash_password(data.password)
         data.password = hashed_password
-        print(data.password)
         user_dict = data.model_dump()
         user_to_create = User(**user_dict)
         user = await self.user_repository.create_user(user_to_create)

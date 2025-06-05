@@ -5,7 +5,7 @@ from typing import AsyncGenerator
 DATABASE_URL = "sqlite+aiosqlite:///./job_connect.db"
 
 # Create the async engine
-async_engine = create_async_engine(DATABASE_URL, echo=True)
+async_engine = create_async_engine(DATABASE_URL, echo=False)
 
 # Create the async session factory
 AsyncSessionLocal = async_sessionmaker(bind=async_engine, expire_on_commit=False)

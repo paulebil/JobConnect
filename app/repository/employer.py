@@ -22,3 +22,14 @@ class EmployerCompanyProfileRepository:
         stmt = select(EmployerCompanyProfile).where(EmployerCompanyProfile.id == employer_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+
+    async def get_profile_by_user_id(self, user_id: int) -> EmployerCompanyProfile | None:
+        stmt = select(EmployerCompanyProfile).where(EmployerCompanyProfile.user_id == user_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_profile_by_company_name(self, company_name: str) -> EmployerCompanyProfile | None:
+        stmt = select(EmployerCompanyProfile).where(EmployerCompanyProfile.company_name == company_name)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
