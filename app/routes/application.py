@@ -33,3 +33,7 @@ async def create_application( data:ApplicationCreate, application_service: Appli
 @application_router.get("/all", status_code=status.HTTP_200_OK, response_model=List[ApplicationResponse])
 async def get_all_applications(application_service: ApplicationService = Depends(get_application_service)):
     return await application_service.get_all_applications()
+
+@application_router.get("/me", status_code=status.HTTP_200_OK, response_model=List[ApplicationResponse])
+async def get_my_applications(jobseeker_id: int, application_service: ApplicationService = Depends(get_application_service)):
+    return await application_service.get_my_applications(jobseeker_id)

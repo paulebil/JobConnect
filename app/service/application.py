@@ -56,10 +56,17 @@ class ApplicationService:
             updated_at=created_application.updated_at,
         )
 
+    async def get_my_applications(self, jobseeker_id: int) -> List[ApplicationResponse]:
+        applications = await self.application_repository.get_all_my_applications(jobseeker_id)
+        if not applications:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Applications by is user found to display.")
+        return [ApplicationResponse.model_validate(application) for application in applications]
+
+
     async def get_all_applications(self) -> List[ApplicationResponse]:
         applications = await self.application_repository.get_all_applications()
         if not applications:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Jobs found to display.")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Applications found to display.")
         return [ApplicationResponse.model_validate(application) for application in applications]
 
 

@@ -1,7 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
+from app.models.job import Job
 from app.models.application import Application
 
 class ApplicationRepository:
@@ -18,7 +20,23 @@ class ApplicationRepository:
             await self.session.rollback()
             raise
 
-    async def get_all_applications(self):
-        stmt = select(Application)
+    async def get_all_my_applications(self, jobseeker_id: int):
+        stmt = (
+            select(Application)
+            .where(Application.jobseeker_id == jobseeker_id)
+            .options(
+                selectinload(Application.job).selectinload(Job.employer)
+            )
+        )
         result = await self.session.execute(stmt)
-        return result.scalars()
+        return result.scalars().all()
+
+    async def get_all_applications(self) :
+        stmt = (
+            select(Application)
+            .options(
+                selectinload(Application.job).selectinload(Job.employer)
+            )
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
