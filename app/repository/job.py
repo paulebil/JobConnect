@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from app.models.job import Job
 
@@ -32,3 +33,12 @@ class JobRepository:
         result = await self.session.execute(stmt)
         job = result.scalar_one_or_none()
         return job
+
+    async def get_job_detail_with_employer(self, job_id: int) -> Job | None:
+        stmt = (
+            select(Job)
+            .where(Job.id == job_id)
+            .options(selectinload(Job.employer))  # eager load employer
+        )
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()

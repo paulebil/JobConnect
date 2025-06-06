@@ -6,7 +6,7 @@ class JobSeekerProfileResponse(BaseModel):
     first_name: str
     last_name: str
     phone_number: str
-    years_of_experience: int
+    work_experience: str
     education_level: str
     created_at: datetime
     updated_at: datetime

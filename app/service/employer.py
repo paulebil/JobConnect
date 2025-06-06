@@ -29,7 +29,7 @@ class EmployerCompanyProfileService:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is not logged in to access this route.")
 
         # check if profile for jobseeker was already: CAN'T CREATE A EMPLOYER PROFILE IF YOU ALREADY HAVE A JOBSEEKER PROFILE
-        jobseeker_profile_exists = self.jobseeker_repository.get_profile_by_user_id(data.user_id)
+        jobseeker_profile_exists = await self.jobseeker_repository.get_profile_by_user_id(data.user_id)
         if jobseeker_profile_exists:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Can't create an employer profile while you have a jobseeker profile")
 
@@ -59,13 +59,13 @@ class EmployerCompanyProfileService:
         return EmployerCompanyProfileResponse.model_validate(created_employer_profile)
 
 
-    async def get_profile_image(self, company_id: int):
-        profile = await self.employer_company_profile_repository.get_profile_by_company_id(company_id)
+    async def get_profile_image(self, user_id: int):
+        profile = await self.employer_company_profile_repository.get_profile_by_user_id(user_id)
         profile_pic_bytes = profile.profile_pic
         return StreamingResponse(
             BytesIO(profile_pic_bytes),
             media_type="image/jpeg",
             headers={
-                "Content-Disposition": f"inline; filename=resume_{company_id}.jpeg"
+                "Content-Disposition": f"inline; filename=resume_{user_id}.jpeg"
             }
         )

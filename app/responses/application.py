@@ -2,9 +2,11 @@ from pydantic import BaseModel
 from app.schemas.application import ApplicationStatus
 from datetime import datetime
 
+from app.responses.job import JobWithEmployerResponse
+
 class ApplicationResponse(BaseModel):
     id: int
-    job_id: int
+    job: JobWithEmployerResponse
     jobseeker_id: int
     status: ApplicationStatus
     created_at: datetime

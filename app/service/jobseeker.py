@@ -35,7 +35,7 @@ class JobSeekerProfileService:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Profile for this user already exists.")
 
         # check if profile for employer was already created with this user_id: CAN'T CREATE A JOBSEEKER PROFILE IF YOU ALREADY HAVE A EMPLOYER PROFILE
-        jobseeker_profile_exists = self.employer_profile_repository.get_profile_by_user_id(data.user_id)
+        jobseeker_profile_exists = await self.employer_profile_repository.get_profile_by_user_id(data.user_id)
         if jobseeker_profile_exists:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Can't create a jobseeker profile while you have an employer profile")
 
@@ -47,8 +47,8 @@ class JobSeekerProfileService:
         profile_to_create = data.model_dump()
         jobseeker_profile = JobSeekerProfile(**profile_to_create)
 
-        MAX_SIZE = 10 * 1024 * 1024  # 2 MB
-        if len(profile_pic_bytes) > MAX_SIZE or len(resume_bytes) > MAX_SIZE:
+        max_size = 10 * 1024 * 1024  # 2 MB
+        if len(profile_pic_bytes) > max_size or len(resume_bytes) > max_size:
             raise HTTPException(status_code=400, detail="File too large.")
 
         jobseeker_profile.profile_pic = profile_pic_bytes

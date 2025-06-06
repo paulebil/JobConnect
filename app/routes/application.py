@@ -11,6 +11,7 @@ from app.repository.application import ApplicationRepository
 
 from app.repository.jobseeker import JobSeekerProfileRepository
 from app.repository.user import UserRepository
+from app.repository.job import JobRepository
 
 application_router = APIRouter(
     tags=["Applications"],
@@ -22,7 +23,8 @@ def get_application_service(session: AsyncSession = Depends(get_session))-> Appl
     application_repository = ApplicationRepository(session)
     jobseeker_repository = JobSeekerProfileRepository(session)
     user_repository = UserRepository(session)
-    return ApplicationService(application_repository, jobseeker_repository, user_repository)
+    job_repository = JobRepository(session)
+    return ApplicationService(application_repository, jobseeker_repository, user_repository, job_repository)
 
 @application_router.post("/create", status_code=status.HTTP_200_OK, response_model=ApplicationResponse)
 async def create_application( data:ApplicationCreate, application_service: ApplicationService =Depends( get_application_service)):

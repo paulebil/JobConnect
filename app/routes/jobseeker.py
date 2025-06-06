@@ -26,7 +26,7 @@ def get_jobseeker_service(session: AsyncSession = Depends(get_session))-> JobSee
 
 @jobseeker_router.post("/profile", status_code=status.HTTP_201_CREATED, response_model=JobSeekerProfileResponse)
 async def create_profile( first_name: str = Form(), last_name: str = Form(), phone_number: str = Form(),
-                          years_of_experience: int = Form(), education_level: str = Form(), user_id: int = Form(),
+                          work_experience: str = Form(), education_level: str = Form(), user_id: int = Form(),
                           profile_pic: UploadFile = File(), resume: UploadFile = File(),
                           jobseeker_service: JobSeekerProfileService = Depends(get_jobseeker_service)):
 
@@ -35,7 +35,7 @@ async def create_profile( first_name: str = Form(), last_name: str = Form(), pho
         first_name=first_name,
         last_name=last_name,
         phone_number=phone_number,
-        years_of_experience=years_of_experience,
+        work_experience=work_experience,
         education_level=education_level
     )
 

@@ -8,14 +8,17 @@ from app.responses.application import ApplicationResponse
 
 from app.repository.jobseeker import JobSeekerProfileRepository
 from app.repository.user import UserRepository
+from app.repository.job import JobRepository
+from app.responses.job import JobWithEmployerResponse
 
 
 class ApplicationService:
     def __init__(self, application_repository: ApplicationRepository, jobseeker_repository: JobSeekerProfileRepository,
-                 user_repository: UserRepository):
+                 user_repository: UserRepository, job_repository: JobRepository):
         self.application_repository = application_repository
         self.jobseeker_repository = jobseeker_repository
         self.user_repository = user_repository
+        self.job_repository = job_repository
 
 
     async def create_application(self, data: ApplicationCreate) -> ApplicationResponse:
@@ -40,7 +43,18 @@ class ApplicationService:
         # persists the data
         created_application = await self.application_repository.create_application(application_to_create)
 
-        return ApplicationResponse.model_validate(created_application)
+        job_with_employer = await self.job_repository.get_job_detail_with_employer(data.job_id)
+        if not job_with_employer:
+            raise HTTPException(status_code=404, detail="Job not found.")
+
+        return ApplicationResponse(
+            id=created_application.id,
+            job=JobWithEmployerResponse.model_validate(job_with_employer),
+            jobseeker_id=created_application.jobseeker_id,
+            status=created_application.status,
+            created_at=created_application.created_at,
+            updated_at=created_application.updated_at,
+        )
 
     async def get_all_applications(self) -> List[ApplicationResponse]:
         applications = await self.application_repository.get_all_applications()

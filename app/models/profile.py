@@ -1,5 +1,5 @@
 from __future__ import annotations
-from sqlalchemy import String, DateTime, LargeBinary, ForeignKey, Text, Integer
+from sqlalchemy import String, DateTime, LargeBinary, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.database import Base
 from datetime import datetime
@@ -15,8 +15,8 @@ class JobSeekerProfile(Base):
     phone_number: Mapped[str] = mapped_column(String(20), nullable=False)
     profile_pic: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
     resume: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
-    years_of_experience: Mapped[int] = mapped_column(Integer)
-    education_level: Mapped[str] = mapped_column(String(100))
+    work_experience: Mapped[int] = mapped_column(Text)
+    education_level: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
