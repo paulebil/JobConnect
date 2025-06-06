@@ -48,3 +48,7 @@ async def get_resume(user_id: int, jobseeker_service: JobSeekerProfileService = 
 @jobseeker_router.get("/profile/{user_id}/image")
 async def get_profile_pic(user_id: int, jobseeker_service: JobSeekerProfileService = Depends(get_jobseeker_service)):
     return await jobseeker_service.get_profile_image(user_id)
+
+@jobseeker_router.get("/profile")
+async def get_profile_information(user_id: int, jobseeker_service: JobSeekerProfileService = Depends(get_jobseeker_service)):
+    return await jobseeker_service.get_jobseeker_profile(user_id)

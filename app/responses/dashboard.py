@@ -14,3 +14,5 @@ class EmployerDashboard(BaseModel):
         "from_attributes": True
     }
 
+class ApplicantsView(BaseModel):
+    pass

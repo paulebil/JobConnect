@@ -110,3 +110,11 @@ class JobSeekerProfileService:
                 "Content-Disposition": f"inline; filename=resume_{user_id}.jpeg"
             }
         )
+
+    async def get_jobseeker_profile(self, user_id: int):
+        # check if profile exists.
+        profile = await self.jobseeker_repository.get_profile_by_user_id(user_id)
+        if not profile:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile for this user does not exists.")
+
+        return JobSeekerProfileResponse.model_validate(profile)
