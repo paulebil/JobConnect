@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-
 class EmployerCompanyProfileResponse(BaseModel):
     id: int
     user_id: int

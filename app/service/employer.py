@@ -6,16 +6,24 @@ from app.repository.employer import EmployerCompanyProfileRepository
 from app.schemas.employer import EmployerCompanyProfileCreate
 from app.models.profile import EmployerCompanyProfile
 from app.responses.employer import EmployerCompanyProfileResponse
+from app.responses.dashboard import EmployerDashboard
 
 from app.repository.user import UserRepository
 from app.repository.jobseeker import JobSeekerProfileRepository
+from app.repository.job import JobRepository
+from app.repository.application import ApplicationRepository
+
+from app.responses.application import ApplicationResponse, ApplicationDashboardResponse
+from app.responses.job import JobResponse
 
 class EmployerCompanyProfileService:
     def __init__(self, employer_company_profile_repository: EmployerCompanyProfileRepository, user_repository: UserRepository,
-                 jobseeker_repository: JobSeekerProfileRepository):
+                 jobseeker_repository: JobSeekerProfileRepository, job_repository: JobRepository, application_repository: ApplicationRepository):
         self.employer_company_profile_repository = employer_company_profile_repository
         self.user_repository = user_repository
         self.jobseeker_repository = jobseeker_repository
+        self.job_repository = job_repository
+        self.application_repository = application_repository
 
     async def create_profile(self, profile_pic: UploadFile, data: EmployerCompanyProfileCreate) -> EmployerCompanyProfileResponse:
         # check if user exists
@@ -48,8 +56,8 @@ class EmployerCompanyProfileService:
         profile_to_create = data.model_dump()
         employer_company_profile = EmployerCompanyProfile(**profile_to_create)
 
-        MAX_SIZE = 10 * 1024 * 1024  # 2 MB
-        if len(profile_pic_bytes) > MAX_SIZE:
+        max_size = 10 * 1024 * 1024  # 2 MB
+        if len(profile_pic_bytes) > max_size:
             raise HTTPException(status_code=400, detail="File too large.")
 
         employer_company_profile.profile_pic = profile_pic_bytes
@@ -68,4 +76,39 @@ class EmployerCompanyProfileService:
             headers={
                 "Content-Disposition": f"inline; filename=resume_{user_id}.jpeg"
             }
+        )
+
+    async def get_dashboard_information(self, user_id: int):
+        # Check if user exists
+        user = await self.user_repository.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User with this id does not exist.")
+
+        # Check if user is logged in
+        if not user.logged_in:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is not logged in to access this route.")
+
+        # Get employer
+        employer = await self.employer_company_profile_repository.get_profile_by_user_id(user_id)
+        if not employer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employer with this user id does not exist.")
+
+        # Get all jobs for this employer
+        my_jobs = await self.job_repository.get_all_my_jobs(employer.id)
+        job_response = [JobResponse.model_validate(job) for job in my_jobs]
+        # print(f"Job Response: {job_response}")
+        if not my_jobs:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This employer has no available job listings.")
+
+        # Get all applications for all jobs (eager-loaded)
+        my_applications = []
+        for job in my_jobs:
+            applications = await self.application_repository.get_all_applications_with_job_and_employer(job.id)
+            application_response = [ApplicationDashboardResponse.model_validate(app) for app in applications]
+            my_applications.extend(application_response)
+
+        # Prepare response
+        return EmployerDashboard(
+            jobs=job_response,
+            applications=my_applications,
         )

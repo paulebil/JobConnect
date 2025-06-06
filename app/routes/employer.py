@@ -11,6 +11,8 @@ from app.responses.employer import EmployerCompanyProfileResponse
 
 from app.repository.user import UserRepository
 from app.repository.jobseeker import JobSeekerProfileRepository
+from app.repository.application import ApplicationRepository
+from app.repository.job import JobRepository
 
 employer_company_profile_router = APIRouter(
     tags=["EmployerCompany"],
@@ -22,7 +24,9 @@ def get_employer_company_profile_service(session: AsyncSession = Depends(get_ses
     employer_company_profile_repository = EmployerCompanyProfileRepository(session)
     user_repository = UserRepository(session)
     jobseeker_profile_repository = JobSeekerProfileRepository(session)
-    return EmployerCompanyProfileService(employer_company_profile_repository, user_repository, jobseeker_profile_repository)
+    job_repository = JobRepository(session)
+    application_repository = ApplicationRepository(session)
+    return EmployerCompanyProfileService(employer_company_profile_repository, user_repository, jobseeker_profile_repository, job_repository, application_repository)
 
 
 @employer_company_profile_router.post("/profile", status_code=status.HTTP_201_CREATED, response_model=EmployerCompanyProfileResponse)
@@ -43,3 +47,7 @@ async def create_profile( user_id: int = Form(), company_name: str = Form(), com
 @employer_company_profile_router.get("/profile/{user_id}/image")
 async def get_profile_pic(user_id: int, employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
     return await employer_company_profile_service.get_profile_image(user_id)
+
+@employer_company_profile_router.get("/dashboard")
+async def get_my_dashboard(user_id: int, employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
+    return await employer_company_profile_service.get_dashboard_information(user_id)

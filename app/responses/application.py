@@ -15,3 +15,14 @@ class ApplicationResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+class ApplicationDashboardResponse(BaseModel):
+    id: int
+    jobseeker_id: int
+    status: ApplicationStatus
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {
+        "from_attributes": True
+    }

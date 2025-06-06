@@ -42,3 +42,9 @@ class JobRepository:
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def get_all_my_jobs(self, employer_id: int):
+        stmt = select(Job).where(Job.employer_id == employer_id)
+        result = await self.session.execute(stmt)
+        job = result.scalars().all()
+        return job

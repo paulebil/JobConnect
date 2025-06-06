@@ -40,3 +40,14 @@ class ApplicationRepository:
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def get_all_applications_with_job_and_employer(self, job_id: int):
+        stmt = (
+            select(Application)
+            .where(Application.job_id == job_id)
+            .options(
+                selectinload(Application.job).selectinload(Job.employer)
+            )
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
