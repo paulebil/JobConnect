@@ -1,10 +1,14 @@
 from __future__ import annotations
-from sqlalchemy import String, DateTime,ForeignKey,Boolean
+from sqlalchemy import String, DateTime,ForeignKey,Boolean, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.database import Base
 from datetime import datetime
 
 from app.utils.utc_time import utcnow
+from app.schemas.job import JobType
+
+from sqlalchemy import Enum as SQLAlchemyEnum
+
 
 class Job(Base):
     __tablename__ = "job"
@@ -12,6 +16,8 @@ class Job(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     employer_id: Mapped[int] = mapped_column(ForeignKey("employer_profile.id"))
     title: Mapped[str] = mapped_column(String(30))
+    job_type: Mapped[JobType] = mapped_column(SQLAlchemyEnum(JobType, name="job-type"), default=JobType.full_time)
+    base_salary: Mapped[int] = mapped_column(Integer)
     description: Mapped[str] = mapped_column(String(255))
     responsibilities: Mapped[str] = mapped_column(String(255), nullable=False)
     requirements: Mapped[str] = mapped_column(String(255), nullable=False)
