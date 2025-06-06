@@ -51,3 +51,8 @@ async def get_profile_pic(user_id: int, employer_company_profile_service: Employ
 @employer_company_profile_router.get("/dashboard")
 async def get_my_dashboard(user_id: int, employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
     return await employer_company_profile_service.get_dashboard_information(user_id)
+
+
+@employer_company_profile_router.get("/applicants")
+async def get_my_applicants_profiles(user_id: int, employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
+    return await employer_company_profile_service.get_all_profiles_for_my_applications(user_id)

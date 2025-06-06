@@ -5,6 +5,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.job import Job
 from app.models.application import Application
+from app.models.profile import JobSeekerProfile
 
 class ApplicationRepository:
     def __init__(self, session: AsyncSession):
@@ -51,3 +52,15 @@ class ApplicationRepository:
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def get_all_profiles_for_my_applications(self, employer_id: int):
+        stmt = (
+            select(JobSeekerProfile)
+            .join(Application, Application.jobseeker_id == JobSeekerProfile.id)
+            .join(Job, Job.id == Application.job_id)
+            .where(Job.employer_id == employer_id)  # Filter for specific employer
+        )
+
+        result = await self.session.execute(stmt)
+        jobseeker_profiles = result.scalars().all()
+        return jobseeker_profiles

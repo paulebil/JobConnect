@@ -3,7 +3,7 @@ from typing import List
 
 from app.responses.application import ApplicationDashboardResponse
 from app.responses.job import JobResponse
-
+from app.responses.jobseeker import JobSeekerProfileResponse
 
 
 class EmployerDashboard(BaseModel):
@@ -15,4 +15,4 @@ class EmployerDashboard(BaseModel):
     }
 
 class ApplicantsView(BaseModel):
-    pass
+    applicants: List[JobSeekerProfileResponse]

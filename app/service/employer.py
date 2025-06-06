@@ -6,7 +6,7 @@ from app.repository.employer import EmployerCompanyProfileRepository
 from app.schemas.employer import EmployerCompanyProfileCreate
 from app.models.profile import EmployerCompanyProfile
 from app.responses.employer import EmployerCompanyProfileResponse
-from app.responses.dashboard import EmployerDashboard
+from app.responses.dashboard import EmployerDashboard, ApplicantsView
 
 from app.repository.user import UserRepository
 from app.repository.jobseeker import JobSeekerProfileRepository
@@ -14,7 +14,9 @@ from app.repository.job import JobRepository
 from app.repository.application import ApplicationRepository
 
 from app.responses.application import ApplicationResponse, ApplicationDashboardResponse
+from app.responses.jobseeker import JobSeekerProfileResponse
 from app.responses.job import JobResponse
+
 
 class EmployerCompanyProfileService:
     def __init__(self, employer_company_profile_repository: EmployerCompanyProfileRepository, user_repository: UserRepository,
@@ -112,3 +114,25 @@ class EmployerCompanyProfileService:
             jobs=job_response,
             applications=my_applications,
         )
+
+    async def get_all_profiles_for_my_applications(self, user_id: int):
+
+        # Check if user exists
+        user = await self.user_repository.get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User with this id does not exist.")
+
+        # Check if user is logged in
+        if not user.logged_in:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is not logged in to access this route.")
+
+        # Get employer
+        employer = await self.employer_company_profile_repository.get_profile_by_user_id(user_id)
+        if not employer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employer with this user id does not exist.")
+
+        # get all profiles
+        applicants_profiles = await self.application_repository.get_all_profiles_for_my_applications(employer.id)
+        applicants_profile_response =  [JobSeekerProfileResponse.model_validate(applicant_profile) for applicant_profile in applicants_profiles]
+
+        return  ApplicantsView(applicants=applicants_profile_response)
