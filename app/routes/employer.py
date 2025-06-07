@@ -14,6 +14,8 @@ from app.repository.jobseeker import JobSeekerProfileRepository
 from app.repository.application import ApplicationRepository
 from app.repository.job import JobRepository
 
+from app.responses.dashboard import ApplicationStatus
+
 employer_company_profile_router = APIRouter(
     tags=["EmployerCompany"],
     prefix="/company",
@@ -56,3 +58,12 @@ async def get_my_dashboard(user_id: int, employer_company_profile_service: Emplo
 @employer_company_profile_router.get("/applicants")
 async def get_my_applicants_profiles(user_id: int, employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
     return await employer_company_profile_service.get_all_profiles_for_my_applications(user_id)
+
+@employer_company_profile_router.get("/applicants/detail/{jobseeker_id}/{job_id}")
+async def get_applicant_profile_detail(jobseeker_id: int, job_id: int, employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
+    return await employer_company_profile_service.get_single_application_jobseeker_profile_detail(jobseeker_id, job_id)
+
+
+@employer_company_profile_router.patch("/applicants/update/{jobseeker_id}/{job_id}")
+async def get_applicant_profile_detail(jobseeker_id: int, job_id: int, app_status:ApplicationStatus ,  employer_company_profile_service: EmployerCompanyProfileService = Depends(get_employer_company_profile_service)):
+    return await employer_company_profile_service.update_applicant_status(jobseeker_id, job_id, app_status)

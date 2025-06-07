@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class JobSeekerProfileResponse(BaseModel):
+    id: int
     user_id: int
     first_name: str
     last_name: str

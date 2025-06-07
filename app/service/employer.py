@@ -7,7 +7,7 @@ from app.schemas.employer import EmployerCompanyProfileCreate
 from app.models.profile import EmployerCompanyProfile
 from app.responses.employer import EmployerCompanyProfileResponse
 from app.responses.dashboard import EmployerDashboard, ApplicantsView, \
-    ApplicationWithJobSeeker, JobResponseLite
+    ApplicationWithJobSeeker, JobResponseLite, ApplicationStatus
 
 from app.repository.user import UserRepository
 from app.repository.jobseeker import JobSeekerProfileRepository
@@ -145,6 +145,35 @@ class EmployerCompanyProfileService:
         ]
 
         return ApplicantsView(applicants=response)
+
+    async def get_single_application_jobseeker_profile_detail(self, jobseeker_id: int, job_id: int):
+        application = await self.application_repository.get_by_jobseeker_and_job(jobseeker_id, job_id)
+        if not application:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application does not exists.")
+        return ApplicationWithJobSeeker(
+            job=JobResponseLite.model_validate(application.job),
+            jobseeker=JobSeekerProfileResponse.model_validate(application.jobseeker),
+            status=application.status,
+            created_at=application.created_at
+        )
+
+    async def update_applicant_status(self, jobseeker_id: int, job_id: int, app_status: ApplicationStatus):
+
+        application_to_update = await self.application_repository.get_by_jobseeker_and_job(jobseeker_id, job_id)
+        if not application_to_update:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application does not exists.")
+
+        application_to_update.status = app_status
+
+        updated_application = await self.application_repository.update_application(application_to_update)
+
+        return ApplicationWithJobSeeker(
+            job=JobResponseLite.model_validate(updated_application.job),
+            jobseeker=JobSeekerProfileResponse.model_validate(updated_application.jobseeker),
+            status=updated_application.status,
+            created_at=updated_application.created_at
+        )
+
 
 
 

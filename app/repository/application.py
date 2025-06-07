@@ -21,6 +21,17 @@ class ApplicationRepository:
             await self.session.rollback()
             raise
 
+    async def update_application(self, application: Application):
+        try:
+            await self.session.merge(application)
+            await self.session.commit()
+            await self.session.refresh(application)
+            return application
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+
+
     async def get_all_my_applications(self, jobseeker_id: int):
         stmt = (
             select(Application)
@@ -64,3 +75,19 @@ class ApplicationRepository:
             .where(Job.employer_id == employer_id)
         )
         return result.scalars().all()
+
+    async def get_by_jobseeker_and_job(self, jobseeker_id: int, job_id: int) -> Application | None:
+        stmt = (
+            select(Application)
+            .where(
+                Application.job_id == job_id,
+                Application.jobseeker_id == jobseeker_id
+            )
+            .options(
+                selectinload(Application.job),
+                selectinload(Application.jobseeker)
+            )
+        )
+        result = await self.session.execute(stmt)
+        application = result.scalar_one_or_none()
+        return application
