@@ -8,6 +8,8 @@ from app.schemas.user import UserCreate, UserLogin
 from app.service.user import UserService
 from app.repository.user import UserRepository
 
+from typing import List
+
 user_router = APIRouter(
     tags=["User"]
 )
@@ -32,3 +34,7 @@ async def logout_user(user_id: int,  user_service: UserService = Depends(get_use
 @user_router.get("/detail/{user_id}", status_code=status.HTTP_200_OK, response_model=UserDetailResponse)
 async def get_user_detail(user_id:int, user_service: UserService = Depends(get_user_service)):
     return await user_service.get_user_details(user_id)
+
+@user_router.get("/all", status_code=status.HTTP_200_OK, response_model=List[UserDetailResponse])
+async def get_all_users(user_servie: UserService = Depends(get_user_service)):
+    return await user_servie.get_all_users()

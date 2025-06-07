@@ -38,3 +38,8 @@ class UserRepository:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_all_users(self):
+        stmt = select(User)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+

@@ -68,3 +68,10 @@ class UserService:
                                 detail="User is not logged in to access this route.")
 
         return UserDetailResponse.model_validate(user_logged_in)
+
+    async def get_all_users(self):
+        users = await self.user_repository.get_all_users()
+        if not users:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Users don't exists yet.")
+
+        return [UserDetailResponse.model_validate(user) for user in users]

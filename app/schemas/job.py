@@ -11,13 +11,13 @@ class JobType(str, Enum):
 
 class JobCreate(BaseModel):
     employer_id: Annotated[int, Field(...)]
-    title: Annotated[str, Field(..., max_length=30)]
+    title: Annotated[str, Field(...)]
     job_type: JobType = JobType.full_time
     base_salary: Annotated[int, Field()]
-    description: Annotated[str, Field(..., max_length=30)]
-    responsibilities: Annotated[str, Field(..., max_length=20)]
+    description: Annotated[str, Field(...)]
+    responsibilities: Annotated[str, Field(...)]
     requirements: Annotated[str, Field(...)]
-    location: Annotated[str, Field(..., max_length=30)]
+    location: Annotated[str, Field(...)]
 
     model_config = {
         "form_attributes": True
