@@ -6,14 +6,15 @@ from app.repository.employer import EmployerCompanyProfileRepository
 from app.schemas.employer import EmployerCompanyProfileCreate
 from app.models.profile import EmployerCompanyProfile
 from app.responses.employer import EmployerCompanyProfileResponse
-from app.responses.dashboard import EmployerDashboard, ApplicantsView
+from app.responses.dashboard import EmployerDashboard, ApplicantsView, \
+    ApplicationWithJobSeeker, JobResponseLite
 
 from app.repository.user import UserRepository
 from app.repository.jobseeker import JobSeekerProfileRepository
 from app.repository.job import JobRepository
 from app.repository.application import ApplicationRepository
 
-from app.responses.application import ApplicationResponse, ApplicationDashboardResponse
+from app.responses.application import ApplicationDashboardResponse
 from app.responses.jobseeker import JobSeekerProfileResponse
 from app.responses.job import JobResponse
 
@@ -131,8 +132,19 @@ class EmployerCompanyProfileService:
         if not employer:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employer with this user id does not exist.")
 
-        # get all profiles
-        applicants_profiles = await self.application_repository.get_all_profiles_for_my_applications(employer.id)
-        applicants_profile_response =  [JobSeekerProfileResponse.model_validate(applicant_profile) for applicant_profile in applicants_profiles]
+        applications = await self.application_repository.get_all_profiles_for_my_applications(employer.id)
 
-        return  ApplicantsView(applicants=applicants_profile_response)
+        response = [
+            ApplicationWithJobSeeker(
+                job=JobResponseLite.model_validate(app.job),
+                jobseeker=JobSeekerProfileResponse.model_validate(app.jobseeker),
+                status=app.status,
+                created_at=app.created_at
+            )
+            for app in applications
+        ]
+
+        return ApplicantsView(applicants=response)
+
+
+

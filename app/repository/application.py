@@ -54,13 +54,13 @@ class ApplicationRepository:
         return result.scalars().all()
 
     async def get_all_profiles_for_my_applications(self, employer_id: int):
-        stmt = (
-            select(JobSeekerProfile)
-            .join(Application, Application.jobseeker_id == JobSeekerProfile.id)
-            .join(Job, Job.id == Application.job_id)
-            .where(Job.employer_id == employer_id)  # Filter for specific employer
+        result = await self.session.execute(
+            select(Application)
+            .join(Application.job)
+            .options(
+                selectinload(Application.jobseeker),
+                selectinload(Application.job)
+            )
+            .where(Job.employer_id == employer_id)
         )
-
-        result = await self.session.execute(stmt)
-        jobseeker_profiles = result.scalars().all()
-        return jobseeker_profiles
+        return result.scalars().all()
